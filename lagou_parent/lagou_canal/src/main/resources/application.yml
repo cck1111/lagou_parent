@@ -1,0 +1,12 @@
+canal:
+  client:
+    instances:
+      example:  # canal实例名称
+        host: 192.168.242.137
+        port: 11111
+spring:
+  rabbitmq:
+    host: 192.168.242.137
+    port: 5672
+    username: guest
+    password: guest

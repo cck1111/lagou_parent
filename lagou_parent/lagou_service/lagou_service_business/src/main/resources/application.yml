@@ -5,11 +5,16 @@ spring:
     name: business
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/lagou_business?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://192.168.242.137:3306/lagou_business?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: root
   main:
     allow-bean-definition-overriding: true #当遇到同样名字的时候，是否允许覆盖注册
+  rabbitmq:
+    host: 192.168.242.137
+    port: 5672
+    username: guest
+    password: guest
 eureka:
   client:
     service-url:

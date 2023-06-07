@@ -17,13 +17,14 @@
         <module>lagou_common</module>
         <module>lagou_common_db</module>
         <module>lagou_eureka_server</module>
-<!--        <module>lagou_service/lagou_service_file</module>-->
+        <module>lagou_canal</module>
+        <!--        <module>lagou_service/lagou_service_file</module>-->
     </modules>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.4.RELEASE</version>
+        <version>2.1.6.RELEASE</version>
     </parent>
 
     <properties>
@@ -64,6 +65,13 @@
             <version>1.1.1</version>
         </dependency>
         <!--引入Jaxb，结束-->
+
+        <!--JJWT依赖-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.0</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

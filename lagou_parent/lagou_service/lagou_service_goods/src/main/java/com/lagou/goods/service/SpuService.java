@@ -1,5 +1,6 @@
 package com.lagou.goods.service;
 
+import com.lagou.goods.pojo.Goods;
 import com.lagou.goods.pojo.Spu;
 import com.github.pagehelper.Page;
 
@@ -19,19 +20,19 @@ public interface SpuService {
      * @param id
      * @return
      */
-    Spu findById(String id);
+    Goods findById(String id);
 
     /***
      * 新增
-     * @param spu
+     * @param
      */
-    void add(Spu spu);
+    void add(Goods goods);
 
     /***
      * 修改
-     * @param spu
+     * @param
      */
-    void update(Spu spu);
+    void update(Goods goods);
 
     /***
      * 删除
@@ -64,6 +65,13 @@ public interface SpuService {
     Page<Spu> findPage(Map<String, Object> searchMap, int page, int size);
 
 
+    void audit(String id);
 
+    void pull(String id);
 
+    void put(String id);
+
+    void restore(String id);
+
+    void realDelete(String id);
 }

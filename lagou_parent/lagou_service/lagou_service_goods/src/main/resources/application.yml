@@ -1,6 +1,8 @@
 server:
   port: 9001
 spring:
+  rabbitmq:
+    host: 192.168.242.137
   application:
     name: goods
   datasource:
@@ -37,3 +39,6 @@ hystrix:
           thread:
             # 熔断器超时时间，默认：1000/毫秒
             timeoutInMilliseconds: 20000
+workerId: 1
+datacenterId: 1
+

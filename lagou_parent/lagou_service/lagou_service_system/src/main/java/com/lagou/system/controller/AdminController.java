@@ -5,11 +5,16 @@ import com.lagou.entity.StatusCode;
 import com.lagou.system.pojo.Admin;
 import com.lagou.system.service.AdminService;
 import com.github.pagehelper.Page;
+import com.lagou.system.util.JwtUtil;
 import com.lagou.util.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/admin")
@@ -24,7 +29,11 @@ public class AdminController {
         // 登录验证
         boolean isSuccess = adminService.login(admin);
         if (isSuccess){
-            return new Result(true,StatusCode.OK,"登陆成功");
+            Map<String,String> map = new HashMap<>();
+            map.put("usetName",admin.getLoginName());
+            String token = JwtUtil.creatJwt(UUID.randomUUID().toString(),admin.getLoginName(),null);
+            map.put("token",token);
+            return new Result(true,StatusCode.OK,"登陆成功",map);
         }else {
             return new Result(false,StatusCode.ERROR,"登陆失败");
         }

@@ -1,4 +1,4 @@
-package com.lagou.eureka;
+package com.lagou.gateWay;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
