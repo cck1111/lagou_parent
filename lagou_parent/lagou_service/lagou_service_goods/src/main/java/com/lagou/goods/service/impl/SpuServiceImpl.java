@@ -7,6 +7,7 @@ import com.lagou.goods.service.SpuService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.lagou.util.IdWorker;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -175,6 +176,8 @@ public class SpuServiceImpl implements SpuService {
     }
 
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public void pull(String id) {
@@ -182,7 +185,8 @@ public class SpuServiceImpl implements SpuService {
         //下架状态
         spu.setIsMarketable("0");
         spuMapper.updateByPrimaryKeySelective(spu);
-
+        // 将下架的商品id发送到MQ
+        rabbitTemplate.convertAndSend("goods_down_exchange","",id);
     }
 
     @Override
@@ -193,10 +197,10 @@ public class SpuServiceImpl implements SpuService {
         }
         //上架状态
         spu.setIsMarketable("1");
-        // 将商品商家状态持久化到数据库
+        // 将商品状态持久化到数据库
         spuMapper.updateByPrimaryKeySelective(spu);
         // 将上架的商品id发送到MQ
-
+        rabbitTemplate.convertAndSend("goods_up_exchange","",id);
     }
 
     /**

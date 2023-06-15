@@ -7,6 +7,8 @@ import com.lagou.goods.service.SkuService;
 import com.github.pagehelper.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @RestController
@@ -103,5 +105,15 @@ public class SkuController {
         return new Result(true,StatusCode.OK,"查询成功",pageResult);
     }
 
-
+    /**
+     *  通过spuId查询sku集合
+     * @param spuId
+     * @return
+     */
+    @GetMapping(value = "/findListBySkuId/{spuId}" )
+    public List<Sku> findListBySpuId(@PathVariable String spuId){
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("spuId",spuId);
+        return skuService.findList(map);
+    }
 }

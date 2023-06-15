@@ -18,6 +18,7 @@
         <module>lagou_service_business_api</module>
         <module>lagou_service_system_api</module>
         <module>lagou_service_user_api</module>
+        <module>lagou_service_search_api</module>
     </modules>
 
     <dependencies>
