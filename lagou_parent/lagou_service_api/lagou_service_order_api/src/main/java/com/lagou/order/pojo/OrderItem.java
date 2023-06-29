@@ -15,7 +15,7 @@ public class OrderItem implements Serializable {
 	private String id;//ID
 
 
-	
+
 	private Integer categoryId1;//1级分类
 	private Integer categoryId2;//2级分类
 	private Integer categoryId3;//3级分类
@@ -32,7 +32,17 @@ public class OrderItem implements Serializable {
 	private Integer postFee;//运费
 	private String isReturn;//是否退货
 
-	
+	//购物车页面复选框选中或取消
+	private boolean checked;
+
+	public boolean isChecked() {
+		return checked;
+	}
+
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+	}
+
 	public String getId() {
 		return id;
 	}
