@@ -6,6 +6,7 @@ import com.lagou.user.service.UserService;
 import com.lagou.user.pojo.User;
 import com.github.pagehelper.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class UserController {
      * @return
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('admin')")
     public Result findAll(){
         List<User> userList = userService.findAll();
         return new Result(true, StatusCode.OK,"查询成功",userList) ;

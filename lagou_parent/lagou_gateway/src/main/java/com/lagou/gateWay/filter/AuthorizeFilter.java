@@ -21,8 +21,8 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthorizeFilter implements GlobalFilter, Ordered {
 
-    private static final String AUTHORIZE_TOKEN = "token";
-
+    //private static final String AUTHORIZE_TOKEN = "token";
+    private static final String AUTHORIZE_TOKEN = "Authorization";
 
     /**
      *  请求时，是将token放入请求head中的
@@ -36,8 +36,8 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         ServerHttpResponse response = exchange.getResponse();
         String path = request.getURI().getPath();
         String token = request.getHeaders().getFirst(AUTHORIZE_TOKEN);
-        // 1.如果用户访问的是登录则放行
-        if (path.contains("/admin/login")){
+        // 1.如果用户访问的是登录则放行 (后台 与 前台)
+        if (path.contains("/admin/login") || path.contains("/user/login")){
             return chain.filter(exchange);
         }
         // 2.如果用户没有携带token,错误提示
@@ -47,13 +47,13 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         }
 
         // 3.解析失败
-        try {
-            JwtUtil.parseJWT(token);
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-            return response.setComplete();
-        }
+//        try {
+//            JwtUtil.parseJWT(token);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+//            return response.setComplete();
+//        }
         // 4.合法访问
         return chain.filter(exchange);
     }

@@ -18,6 +18,7 @@
         <module>lagou_common_db</module>
         <module>lagou_eureka_server</module>
         <module>lagou_canal</module>
+        <module>lagou-user-oauth</module>
         <!--        <module>lagou_service/lagou_service_file</module>-->
     </modules>
 
