@@ -183,4 +183,8 @@ public class UserServiceImpl implements UserService {
         return example;
     }
 
+    @Override
+    public int addUserPoints(String username, Integer points) {
+        return userMapper.addUserPoints(username,points);
+    }
 }

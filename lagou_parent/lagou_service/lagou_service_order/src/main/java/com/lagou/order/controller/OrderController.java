@@ -5,6 +5,7 @@ import com.lagou.entity.StatusCode;
 import com.lagou.order.service.OrderService;
 import com.lagou.order.pojo.Order;
 import com.github.pagehelper.Page;
+import com.lagou.util.TokenDecode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -47,6 +48,12 @@ public class OrderController {
      */
     @PostMapping
     public Result add(@RequestBody Order order){
+        //获取用户名
+        Map<String, String> userMap =
+                TokenDecode.getUserInfo();
+        String username = userMap.get("username");
+        //设置购买用户
+        order.setUsername(username);
         orderService.add(order);
         return new Result(true,StatusCode.OK,"添加成功");
     }

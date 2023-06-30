@@ -5,6 +5,7 @@ import com.lagou.user.service.AddressService;
 import com.lagou.user.pojo.Address;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.lagou.util.TokenDecode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
@@ -102,6 +103,16 @@ public class AddressServiceImpl implements AddressService {
         PageHelper.startPage(page,size);
         Example example = createExample(searchMap);
         return (Page<Address>)addressMapper.selectByExample(example);
+    }
+
+    @Override
+    public List<Address> list() {
+        //获取用户登录信息
+        Map<String, String> userMap = TokenDecode.getUserInfo();
+        String username = userMap.get("username");
+        Address address = new Address();
+        address.setUsername(username);
+        return addressMapper.select(address);
     }
 
     /**

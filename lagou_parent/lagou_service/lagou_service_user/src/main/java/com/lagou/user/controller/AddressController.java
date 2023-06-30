@@ -18,6 +18,18 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
+
+    /**
+     * 根据用户名称查询地址列表
+     * @return
+     */
+    @RequestMapping("/queryByUserName")
+    public Result<Address> findByUserName(){
+        List<Address> addressList = addressService.list();
+        return new Result<>(true,StatusCode.OK,"查询成 功",addressList);
+    }
+
+
     /**
      * 查询全部数据
      * @return

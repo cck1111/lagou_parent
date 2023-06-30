@@ -21,6 +21,17 @@ public class SkuController {
     private SkuService skuService;
 
     /**
+     *  库存变更 & 销量变更
+     * @param username
+     * @return
+     */
+    @PostMapping("/changeCount")
+    public Result changeInventoryAndSaleNumber(@RequestParam(value = "username") String username){
+        skuService.changeInventoryAndSaleNumber(username);
+        return new Result(true,StatusCode.OK,"变更成功");
+    }
+
+    /**
      * 查询全部数据
      * @return
      */

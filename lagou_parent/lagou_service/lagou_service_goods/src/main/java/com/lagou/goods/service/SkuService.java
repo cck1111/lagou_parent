@@ -63,7 +63,11 @@ public interface SkuService {
      */
     Page<Sku> findPage(Map<String, Object> searchMap, int page, int size);
 
-
-
+    /**
+     *  库存变更 & 销量变更
+     * @param username
+     * @return
+     */
+    void changeInventoryAndSaleNumber(String username);
 
 }

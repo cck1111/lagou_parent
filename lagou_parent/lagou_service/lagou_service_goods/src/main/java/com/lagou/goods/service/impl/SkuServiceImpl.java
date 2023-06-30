@@ -5,7 +5,9 @@ import com.lagou.goods.service.SkuService;
 import com.lagou.goods.pojo.Sku;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.lagou.order.pojo.OrderItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
@@ -17,6 +19,8 @@ public class SkuServiceImpl implements SkuService {
 
     @Autowired
     private SkuMapper skuMapper;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 查询全部列表
@@ -187,4 +191,21 @@ public class SkuServiceImpl implements SkuService {
         return example;
     }
 
+
+    @Override
+    public void changeInventoryAndSaleNumber(String username) {
+        //获取购物车数据
+        List<OrderItem> orderItems =
+                redisTemplate.boundHashOps("Cart_" + username).values();
+        //循环递减
+        for (OrderItem orderItem : orderItems) {
+            if (orderItem.isChecked()) {
+                //递减库存
+                int count = skuMapper.decrCount(orderItem);
+                if (count <= 0) {
+                    throw new RuntimeException("库存不足，递 减失败！");
+                }
+            }
+        }
+    }
 }

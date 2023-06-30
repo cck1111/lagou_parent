@@ -3,9 +3,7 @@ package com.lagou.goods.feign;
 import com.lagou.entity.Result;
 import com.lagou.goods.pojo.Sku;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author cck
@@ -22,5 +20,15 @@ public interface SkuFeign {
      * @return
      */
     @GetMapping("/{id}")
-    public Result<Sku>  findById(@PathVariable String id);
+    public Result<Sku> findById(@PathVariable String id);
+
+
+    /**
+     * 库存变更 & 销量变更
+     *
+     * @param username
+     * @return
+     */
+    @PostMapping("/changeCount")
+    public Result changeInventoryAndSaleNumber(@RequestParam(value = "username") String username);
 }

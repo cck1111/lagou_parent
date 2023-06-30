@@ -5,6 +5,7 @@ import com.lagou.entity.StatusCode;
 import com.lagou.user.service.UserService;
 import com.lagou.user.pojo.User;
 import com.github.pagehelper.Page;
+import com.lagou.util.TokenDecode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,25 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    /**
-     * 查询全部数据
-     * @return
+    /***
+     * 增加用户积分
+     * @param points:要添加的积分
      */
+    @GetMapping(value = "/points/add")
+    public Result addPoints(Integer points){
+        //获取用户名
+        Map<String, String> userMap = TokenDecode.getUserInfo();
+        String username = userMap.get("username");
+        //添加积分
+        userService.addUserPoints(username,points);
+        return new Result(true,StatusCode.OK,"添加积分成功！");
+    }
+
+
+        /**
+         * 查询全部数据
+         * @return
+         */
     @GetMapping
     @PreAuthorize("hasAuthority('admin')")
     public Result findAll(){
