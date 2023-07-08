@@ -1,16 +1,20 @@
 package com.lagou.goods.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,10 +38,21 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
      * @param jwtAccessTokenConverter
      * @return
      */
+//    @Bean
+//    public TokenStore tokenStore(JwtAccessTokenConverter
+//                                         jwtAccessTokenConverter) {
+//        return new JwtTokenStore(jwtAccessTokenConverter);
+//    }
+
+    @Autowired
+    private RedisConnectionFactory redisConnectionFactory;
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        resources.tokenStore(tokenStore()).stateless(true);// ⽆状态设置
+    }
     @Bean
-    public TokenStore tokenStore(JwtAccessTokenConverter
-                                         jwtAccessTokenConverter) {
-        return new JwtTokenStore(jwtAccessTokenConverter);
+    public TokenStore tokenStore() {
+        return new RedisTokenStore(redisConnectionFactory);
     }
     /***
      * 定义JJwtAccessTokenConverter

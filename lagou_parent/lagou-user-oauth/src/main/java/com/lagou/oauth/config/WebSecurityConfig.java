@@ -79,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()       //启用表单身份验证
                 .and()
-                .authorizeRequests()    //限制基于Request请求访问
+                .authorizeRequests().antMatchers("/oauth/**").permitAll()    //限制基于Request请求访问
                 .anyRequest()
                 .authenticated();       //其他请求都需要经过验证
 
@@ -90,7 +90,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @param args
      */
     public static void main(String[] args) {
-        String encode = new BCryptPasswordEncoder().encode("123456");
+        String encode = new BCryptPasswordEncoder().encode("lagou");
         System.out.println(encode);
     }
 }

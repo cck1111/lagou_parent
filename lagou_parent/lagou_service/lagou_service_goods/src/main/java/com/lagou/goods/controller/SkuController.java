@@ -127,4 +127,17 @@ public class SkuController {
         map.put("spuId",spuId);
         return skuService.findList(map);
     }
+
+    /**
+     * 库存恢复
+     * @param skuId
+     * @param num
+     */
+    @PostMapping("/resumeStockNum")
+    public Result resumeStockNum(@RequestParam String skuId, @RequestParam Integer num){
+        skuService.resumeStockNum(skuId,num);
+
+        return new Result(true,StatusCode.OK,"操作成功");
+
+    }
 }

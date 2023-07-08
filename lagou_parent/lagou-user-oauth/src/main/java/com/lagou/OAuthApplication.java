@@ -12,7 +12,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @SpringBootApplication
 @EnableDiscoveryClient
 @MapperScan(basePackages = "com.lagou.auth.dao")
-@EnableFeignClients(basePackages = "com.lagou.oauth.feign")
+@EnableFeignClients(basePackages = "com.lagou.user.feign")
 public class OAuthApplication {
 
     public static void main(String[] args) {

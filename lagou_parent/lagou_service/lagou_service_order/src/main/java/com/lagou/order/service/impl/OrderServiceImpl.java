@@ -1,20 +1,36 @@
 package com.lagou.order.service.impl;
 
+import com.lagou.entity.Result;
 import com.lagou.goods.feign.SkuFeign;
 import com.lagou.order.dao.OrderItemMapper;
+import com.lagou.order.dao.OrderLogMapper;
 import com.lagou.order.dao.OrderMapper;
 import com.lagou.order.pojo.OrderItem;
+import com.lagou.order.pojo.OrderLog;
 import com.lagou.order.service.CartService;
 import com.lagou.order.service.OrderService;
 import com.lagou.order.pojo.Order;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.lagou.order.util.AdminToken;
 import com.lagou.user.feign.UserFeign;
 import com.lagou.util.IdWorker;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import tk.mybatis.mapper.entity.Example;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +50,14 @@ public class OrderServiceImpl implements OrderService {
     private SkuFeign skuFeign;
     @Autowired
     private UserFeign userFeign;
+    @Autowired
+    private OrderLogMapper orderLogMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private LoadBalancerClient loadBalancerClient;
+    @Autowired
+    private RestTemplate restTemplate;
 
     /**
      * 查询全部列表
@@ -101,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.insertSelective(order);
         //调用商品微服务，更新库存机器销量的变更
         skuFeign.changeInventoryAndSaleNumber(order.getUsername());
-        //增加用户积分
+        //增加用户积分   可采用mq异步的方式 发送一个消息 usename,points
         userFeign.addPoints(10);
         //添加订单明细
         for (OrderItem orderItem : orderItems) {
@@ -116,6 +140,8 @@ public class OrderServiceImpl implements OrderService {
                 cartService.delete(orderItem.getSkuId(), order.getUsername());
             }
         }
+        // 订单编号发送到ordercreate_queue ttl队列
+        rabbitTemplate.convertAndSend("","ordercreate_queue",order.getId());
     }
 
 
@@ -173,6 +199,94 @@ public class OrderServiceImpl implements OrderService {
         PageHelper.startPage(page,size);
         Example example = createExample(searchMap);
         return (Page<Order>)orderMapper.selectByExample(example);
+    }
+
+    @Override
+    public void changePayStatus(Map<String, String> paramsMap) {
+        Order order = orderMapper.selectByPrimaryKey(paramsMap.get("out_trade_no"));
+            //存在订单且状态为0
+        if (order != null && "0".equals(order.getPayStatus())) {
+            order.setPayStatus("1");
+            order.setOrderStatus("1");
+            //修改支付宝流水号
+            order.setTransactionId(paramsMap.get("trade_no"));
+            order.setUpdateTime(new Date());
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                order.setPayTime(format.parse(paramsMap.get("gmt_payment")));
+            } catch (ParseException e) {
+                order.setPayTime(new Date());
+                e.printStackTrace();
+            }
+            orderMapper.updateByPrimaryKeySelective(order);
+            //记录订单变动日志
+            OrderLog orderLog = new OrderLog();
+            orderLog.setId(idWorker.nextId() + "");
+            // 系统
+            orderLog.setOperater("system");
+            //当前日期
+            orderLog.setOperateTime(new Date());
+            orderLog.setOrderStatus("1");
+            orderLog.setPayStatus("1");
+            orderLog.setRemarks("支付流水号" + paramsMap.get("trade_no"));
+            orderLog.setOrderId(order.getId());
+            orderLogMapper.insert(orderLog);
+        }
+    }
+
+    /**
+     *  关闭订单
+     * @param orderId
+     */
+    @Override
+    public void close(String orderId) {
+        //关闭订单
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        //更新时间
+        order.setUpdateTime(new Date());
+        //关闭时间
+        order.setCloseTime(new Date());
+        //关闭状态
+        order.setOrderStatus("4");
+        orderMapper.updateByPrimaryKeySelective(order);
+        //记录订单变动
+        OrderLog orderLog = new OrderLog();
+        orderLog.setRemarks(orderId + "订单已关闭");
+        orderLog.setOrderStatus("4");
+        orderLog.setOperateTime(new Date());
+        orderLog.setOperater("system");
+        orderLog.setId(idWorker.nextId() + "");
+        orderLogMapper.insert(orderLog);
+        //恢复库存&销量
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrderId(orderId);
+        List<OrderItem> orderItems = orderItemMapper.select(orderItem);
+        for (OrderItem orderItem_  : orderItems) {
+            // 调用商品微服务  由于是通过rabbitmq监听调用的微服务，不存有令牌
+            //skuFeign.resumeStockNum(orderItem_.getSkuId(),orderItem_.getNum());
+            // 获取商品微服务实例，自己签发令牌调用url
+            ServiceInstance serviceInstance = loadBalancerClient.choose("goods");
+            //2.拼写目标地址
+            String path = serviceInstance.getUri().toString()+"/sku/resumeStockNum";
+            //3.封装参数
+            MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
+            formData.add("skuId",orderItem_.getSkuId());
+            formData.add("num",orderItem_.getNum()+"");
+            //定义header
+            MultiValueMap<String,String> header = new LinkedMultiValueMap<>();
+            //借助AdminToken签发管理员令牌,否则直接访问商品微服务会发送401异常
+            header.add("Authorization","bearer "+ AdminToken.create());
+            //执行请求
+            Result result = null;
+            try {
+                ResponseEntity<Result> mapResponseEntity =
+                        restTemplate.exchange(path, HttpMethod.POST, new HttpEntity<MultiValueMap<String, String>>(formData, header), Result.class);
+                result = mapResponseEntity.getBody();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
     }
 
     /**

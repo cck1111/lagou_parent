@@ -31,4 +31,12 @@ public interface SkuFeign {
      */
     @PostMapping("/changeCount")
     public Result changeInventoryAndSaleNumber(@RequestParam(value = "username") String username);
+
+    /**
+     * 库存恢复
+     * @param skuId
+     * @param num
+     */
+    @PostMapping("/resumeStockNum")
+    public Result resumeStockNum(@RequestParam String skuId, @RequestParam Integer num);
 }

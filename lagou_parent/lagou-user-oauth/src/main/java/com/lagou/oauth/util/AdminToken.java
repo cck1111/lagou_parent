@@ -41,8 +41,8 @@ public class AdminToken {
         //定义Payload
         Map<String, Object> tokenMap = new HashMap<>();
         tokenMap.put("id", "1");
-        tokenMap.put("name", "YuanJing");
-        tokenMap.put("authorities", new String[]{"oauth","admin"});
+        tokenMap.put("username","lagou");
+        tokenMap.put("authorities", new String[]{"user,vip,admin"});
         //生成Jwt令牌
         Jwt jwt = JwtHelper.encode(JSON.toJSONString(tokenMap), new RsaSigner(rsaPrivate));
         //取出令牌

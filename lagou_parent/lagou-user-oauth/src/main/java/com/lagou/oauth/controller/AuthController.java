@@ -5,6 +5,7 @@ import com.lagou.entity.StatusCode;
 import com.lagou.oauth.service.AuthService;
 import com.lagou.oauth.util.AuthToken;
 import com.lagou.oauth.util.CookieUtil;
+import com.lagou.user.feign.UserFeign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +38,8 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private UserFeign userFeign;
 
     /**
      *  用户登录/认证 客户端ID 客户端密钥

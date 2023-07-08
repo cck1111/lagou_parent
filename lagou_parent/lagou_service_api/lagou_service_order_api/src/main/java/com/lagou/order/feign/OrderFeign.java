@@ -1,6 +1,7 @@
-package com.lagou.oauth.feign;
+package com.lagou.order.feign;
 
 import com.lagou.entity.Result;
+import com.lagou.order.pojo.Order;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,17 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author cck
- * @date 2023/6/28 9:14
+ * @date 2023/7/4 15:25
  */
-@FeignClient(name = "user")
-@RequestMapping("/user")
-public interface UserFeign {
+@FeignClient(name = "order")
+@RequestMapping("/order")
+public interface OrderFeign {
 
     /***
      * 根据ID查询数据
-     * @param username
+     * @param id
      * @return
      */
-    @GetMapping("/{username}")
-    public Result findById(@PathVariable String username);
+    @GetMapping("/{id}")
+    public Result<Order> findById(@PathVariable String id);
 }

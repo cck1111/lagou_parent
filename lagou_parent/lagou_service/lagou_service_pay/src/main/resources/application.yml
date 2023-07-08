@@ -1,0 +1,16 @@
+server:
+  port: 9010
+spring:
+  application:
+    name: pay
+  rabbitmq:
+    host: 192.168.242.137
+  main:
+    allow-bean-definition-overriding: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:6868/eureka
+  instance:
+    prefer-ip-address: true
+

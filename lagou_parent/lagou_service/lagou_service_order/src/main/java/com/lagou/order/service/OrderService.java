@@ -64,6 +64,8 @@ public interface OrderService {
     Page<Order> findPage(Map<String, Object> searchMap, int page, int size);
 
 
+    void changePayStatus(Map<String, String> map);
 
+    void close(String orderId);
 
 }

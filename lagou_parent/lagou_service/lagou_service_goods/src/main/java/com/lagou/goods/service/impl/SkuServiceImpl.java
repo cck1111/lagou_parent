@@ -208,4 +208,12 @@ public class SkuServiceImpl implements SkuService {
             }
         }
     }
+
+    @Override
+    public void resumeStockNum(String skuId, Integer num) {
+        Sku sku = skuMapper.selectByPrimaryKey(skuId);
+        sku.setNum(sku.getNum()+num);
+        sku.setSaleNum(sku.getSaleNum()-num);
+        skuMapper.updateByPrimaryKey(sku);
+    }
 }

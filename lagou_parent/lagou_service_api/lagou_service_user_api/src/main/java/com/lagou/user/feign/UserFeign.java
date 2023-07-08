@@ -3,6 +3,7 @@ package com.lagou.user.feign;
 import com.lagou.entity.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -19,4 +20,12 @@ public interface UserFeign {
      */
     @GetMapping(value = "/points/add")
     public Result addPoints(Integer points);
+
+    /***
+     * 根据ID查询数据
+     * @param username
+     * @return
+     */
+    @GetMapping("/{username}")
+    public Result findById(@PathVariable String username);
 }

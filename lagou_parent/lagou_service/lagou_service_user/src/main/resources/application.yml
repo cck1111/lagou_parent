@@ -8,6 +8,9 @@ spring:
     url: jdbc:mysql://192.168.242.137:3306/lagou_user?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false
     username: root
     password: root
+  redis:
+    host: 192.168.242.137
+    port: 6379
   main:
     allow-bean-definition-overriding: true #当遇到同样名字的时候，是否允许覆盖注册
 eureka:

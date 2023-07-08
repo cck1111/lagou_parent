@@ -3,15 +3,6 @@ server:
 spring:
   application:
     name: user-auth
-  redis:
-    host: 192.168.242.137
-    port: 6379
-    password:
-    jedis:
-      pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 0
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://192.168.242.137:3306/lagou_user?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false
@@ -19,6 +10,9 @@ spring:
     password: root
   main:
     allow-bean-definition-overriding: true
+  redis:
+    host: 192.168.242.137
+    port: 6379
 eureka:
   instance:
     prefer-ip-address: true

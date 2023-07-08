@@ -1,4 +1,4 @@
-package com.lagou.interceptor;
+package com.lagou.order.interceptor;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -13,7 +13,7 @@ import java.util.Enumeration;
  * @date 2023/6/29 16:08
  */
 @Component
-public class FeignInterceptor  implements RequestInterceptor {
+public class FeignInterceptor implements RequestInterceptor {
 
     /**
      * Feign之前调用拦截

@@ -40,7 +40,7 @@ public class UserController {
          * @return
          */
     @GetMapping
-    @PreAuthorize("hasAuthority('admin')")
+   // @PreAuthorize("hasAuthority('admin')")
     public Result findAll(){
         List<User> userList = userService.findAll();
         return new Result(true, StatusCode.OK,"查询成功",userList) ;

@@ -1,8 +1,8 @@
 package com.lagou.oauth.config;
 
 import com.lagou.entity.Result;
-import com.lagou.oauth.feign.UserFeign;
 import com.lagou.oauth.util.UserJwt;
+import com.lagou.user.feign.UserFeign;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         com.lagou.user.pojo.User user = objectMapper.convertValue(result.getData(), com.lagou.user.pojo.User.class);
         //根据用户名查询用户信息
         String pwd = user.getPassword();
+     //   String pwd = new BCryptPasswordEncoder().encode("lagou");
         //创建权限字符串
         String permissions = "user,vip,admin";
         //创建用户JWT对象

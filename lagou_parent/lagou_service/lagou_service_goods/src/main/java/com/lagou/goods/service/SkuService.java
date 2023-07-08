@@ -70,4 +70,5 @@ public interface SkuService {
      */
     void changeInventoryAndSaleNumber(String username);
 
+    void resumeStockNum(String skuId, Integer num);
 }

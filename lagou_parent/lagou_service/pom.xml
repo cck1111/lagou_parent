@@ -21,6 +21,7 @@
         <module>lagou_service_file</module>
         <module>lagou_service_search</module>
         <module>lagou-service-page</module>
+        <module>lagou_service_pay</module>
     </modules>
 
 

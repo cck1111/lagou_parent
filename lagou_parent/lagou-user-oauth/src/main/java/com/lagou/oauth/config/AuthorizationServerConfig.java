@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.bootstrap.encrypt.KeyProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +20,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -49,8 +51,8 @@ class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     private AuthenticationManager authenticationManager;
 
     //令牌持久化存储接口
-    @Autowired
-    private TokenStore tokenStore;
+//    @Autowired
+//    private TokenStore tokenStore;
 
     @Autowired
     private CustomUserAuthenticationConverter customUserAuthenticationConverter;
@@ -77,7 +79,7 @@ class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints.accessTokenConverter(jwtAccessTokenConverter)//token生成的方式
                 .authenticationManager(authenticationManager) //认证管理器
-                .tokenStore(tokenStore)                       //保存令牌
+                .tokenStore(tokenStore())                       //保存令牌
                 .userDetailsService(userDetailsService);      //校验 消费者信息 并授权
     }
 
@@ -117,11 +119,23 @@ class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
      * 令牌保存
      * @return
      */
-    @Bean
+//    @Bean
+//    @Autowired
+//    public TokenStore tokenStore(JwtAccessTokenConverter jwtAccessTokenConverter) {
+//        return new JwtTokenStore(jwtAccessTokenConverter);
+//    }
+
     @Autowired
-    public TokenStore tokenStore(JwtAccessTokenConverter jwtAccessTokenConverter) {
-        return new JwtTokenStore(jwtAccessTokenConverter);
+    private RedisConnectionFactory redisConnectionFactory;
+    /**
+     * 令牌保存
+     * @return
+     */
+    @Bean
+    public TokenStore tokenStore() {
+        return new RedisTokenStore(redisConnectionFactory);
     }
+
 
 
     /**
