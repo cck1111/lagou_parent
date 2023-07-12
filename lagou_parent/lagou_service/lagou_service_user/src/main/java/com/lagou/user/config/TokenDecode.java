@@ -1,4 +1,4 @@
-package com.lagou.util;
+package com.lagou.user.config;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;

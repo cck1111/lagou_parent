@@ -5,7 +5,7 @@ import com.lagou.entity.StatusCode;
 import com.lagou.order.service.OrderService;
 import com.lagou.order.pojo.Order;
 import com.github.pagehelper.Page;
-import com.lagou.util.TokenDecode;
+import com.lagou.order.util.TokenDecode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

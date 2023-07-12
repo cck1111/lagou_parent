@@ -22,8 +22,10 @@ import com.lagou.order.feign.OrderFeign;
 import com.lagou.order.pojo.Order;
 import com.lagou.pay.config.AlipayConfig;
 import com.lagou.pay.util.MatrixToImageWriter;
+import com.lagou.seckill.pojo.SeckillOrder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
@@ -52,16 +54,19 @@ public class AlipayController {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 为了保持接口的幂等性，在前端系统调用该接口之前需要先进行支付的校验
      * 该接口中申请二维码链接之前，先判断支付状态
      * 请求二维码
      * @param orderId  订单ID(out_trade_no)
+     * @param exchange  申请二维码的时候区分是普通订单还是秒杀订单  普通订单：order_exchange; 秒杀订单 seckill_exchange
      * @param response
      */
     @RequestMapping("/qrCode")
-    public void preCreate(String orderId, HttpServletResponse response) throws Exception {
+    public void preCreate(String orderId, String exchange,HttpServletResponse response) throws Exception {
         // 1.获取订单对象，判断支付状态
         Order order = orderFeign.findById(orderId).getData();
         if (order == null){
@@ -70,6 +75,17 @@ public class AlipayController {
         if ("1".equals(order.getPayStatus()) ){
             response.getOutputStream().print(orderId +"yizhifu");
         }
+        //如果是普通订单去订单微服务获取订单对象,如果是秒杀订单去redis中获取订单对象SeckillOrder
+        String totalMoney = null;
+        //普通订单
+        if ("order_exchange".equals(exchange)) {
+            totalMoney = orderFeign.findById(orderId).getData().getTotalMoney().toString();
+        }
+        //秒杀订单
+        if ("seckill_exchange".equals(exchange)) {
+            totalMoney = ((SeckillOrder)redisTemplate.boundHashOps("SeckillOrder_").get("yuanjing")).getMoney().toString();
+        }
+
         // 2.创建AlipayTradePrecreateRequest 对象
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
         // 设置notifyUrl
@@ -79,8 +95,10 @@ public class AlipayController {
         model.setOutTradeNo(orderId);
         //卖家支付宝用户ID
         model.setSellerId("2088721004694751");
+        // 设置body 回调的时候会原参数返回(来区分是普通订单 还是 秒杀订单)
+        model.setBody(exchange);
         //设置支付金额
-        model.setTotalAmount(order.getTotalMoney().toString());
+        model.setTotalAmount(totalMoney);
         //商品的标题/交易标题/订单标题/订单关键字等。
         model.setSubject("拉勾商城-订单支付");
         /** 销售产品码。*/
@@ -192,9 +210,9 @@ public class AlipayController {
             messageMap.put("gmt_payment", gmt_payment);
             String jsonString = JSON.toJSONString(messageMap);
             System.out.println(jsonString);
+            String exchange = params.get("body");
             //发送到MQ
-            rabbitTemplate.convertAndSend("order_exchange",
-                "", jsonString);
+            rabbitTemplate.convertAndSend(exchange, "", jsonString);
              return "success";
         } else {
             System.out.println("支付宝回调签名认证失败");

@@ -5,7 +5,6 @@ import com.lagou.entity.StatusCode;
 import com.lagou.user.service.UserService;
 import com.lagou.user.pojo.User;
 import com.github.pagehelper.Page;
-import com.lagou.util.TokenDecode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
